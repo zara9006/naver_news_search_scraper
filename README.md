@@ -34,6 +34,7 @@ searching_news_comments.py 파일을 실행하면 output 폴더에 뉴스와 댓
 | --debug | False | --debug 입력 시 True, 각 일자별로 3 페이지의 뉴스와 댓글만 수집합니다 |
 | --verbose | False | --verbose 입력 시 True, 진행 상황을 자세히 보여줍니다|
 | --comments | False | --comments 입력 시 True, 각 뉴스에 해당하는 댓글을 함께 수집합니다|
+| --dbsave | False | --dbsave 입력 시 True, db_setting.py 에 몽고db 데이터 베이스 접속 정보를 저장 하고 실행|
 
 ## Query file 구성
 
