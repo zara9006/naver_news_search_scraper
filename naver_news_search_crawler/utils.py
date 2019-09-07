@@ -1,6 +1,7 @@
 import json
 import os
 import requests
+import re
 import urllib
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -53,27 +54,27 @@ def get_path(*dir_path_list):
 def current_timestamp():
     return str(datetime.now())
 
-number_of_tries = 10
+# user-agent를 지정해서 기계가 아닌 일반 유저가 브라우저로 접근한 것처럼 한거 같다. ( 추측 )
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
+# BeautifulSoup를 사용하여 html을 파싱해서 반환
 def get_soup(url):
-    for num_iter in range(number_of_tries):
-        try:
-            response = requests.get(url, headers=headers)
-            soup = BeautifulSoup(response.text, 'lxml')
-            return soup
-        except Exception as e:
-            if num_iter < number_of_tries - 1:
-                continue
-            raise ValueError('failed in util.getDocument(), %s' % str(e))
-    return None
+    try:
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.text, 'lxml')
+        return soup
+    except Exception as e:
+        raise ValueError('failed in util.getDocument(), %s' % str(e))
+        return None
 
+# 문자열 날짜를 날짜타입으로
 def convert_str_date_to_datetime(string_date):
     try:
         return datetime.strptime(string_date, '%Y-%m-%d')
     except Exception as e:
         raise ValueError('Failed to Convert String to Datetime %s' % str(e))
 
+# 날짜타입을 문자열로
 def convert_datetime_to_str(date):
     try:
         return date.isoformat().split('T')[0]
@@ -87,3 +88,16 @@ def url_encode(query, encoding='utf-8'):
         except Exception as e:
             raise ValueError('Failed to encode query %s' % str(e))
     return '+'.join([encode_a_term(term) for term in query.split()])
+
+def str_date_extraction(string_date):
+    date = re.search(r'\d{4}.\d{2}.\d{2}', string_date).group()
+    time = re.search(r'\d{2}:\d{2}', string_date)
+    if (time is None):
+        time = re.search(r'\d{1}:\d{2}', string_date)
+
+    time = time.group()
+
+    if ('오후' in string_date):
+        time = str((int(time.split(':')[0]) + 12)) + ":" + time.split(':')[1]
+
+    return date+" "+time
